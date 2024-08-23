@@ -60,7 +60,7 @@ def handle_client(conn, addr):
             conn.sendall('Disconnection Requested (Established).'.encode())
             print(f'[DISCONNECTED] {addr} disconnected.')
             connected = False
-        print(f'Received from Client: {msg}')
+        print(f'Received from {addr}: {msg}')
         if msg == 'list':
             results=Baseplate.show_data()
             print(f'Stored: {results}')
