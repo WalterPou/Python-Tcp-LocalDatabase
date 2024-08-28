@@ -2,8 +2,8 @@ import socket
 import threading
 import json
 
-lhost = 'localhost'
-lport = int(input('LPORT: '))
+lhost = int('LH: ')
+lport = int(input('LP: '))
 DISCONNECT_MESSSAGE = "!DISCONNECT"
 
 Server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
