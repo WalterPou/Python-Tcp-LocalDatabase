@@ -2,7 +2,7 @@ import socket
 import threading
 import json
 
-lhost = '0.0.0.0'
+lhost = 'localhost'
 lport = int(input('LPORT: '))
 DISCONNECT_MESSSAGE = "!DISCONNECT"
 
@@ -60,29 +60,38 @@ def handle_client(conn, addr):
             conn.sendall('Disconnection Requested (Established).'.encode())
             print(f'[DISCONNECTED] {addr} disconnected.')
             connected = False
-        print(f'Received from {addr}: {msg}')
+        #print(f'Received from {addr}: {msg}')
         if msg == 'list':
             results=Baseplate.show_data()
-            print(f'Stored: {results}')
+            print(f'Listing Data: {results}')
             conn.sendall(str(Baseplate.show_data()).encode())
         elif msg == 'store':
+            print(f'{addr} is storing their info..')
             while True:
                 try:
                     conn.sendall('Enter the ID that you want to replace/write: '.encode())
                     msg = int(conn.recv(1024).decode())
+                    print(f'{addr} is storing their info with an ID {msg}')
                     conn.sendall('Data value: '.encode())
                     data = conn.recv(1024).decode()
                     results = Baseplate.Execute(msg, data)
                     conn.sendall(results.encode())
+                    print(f'{addr} Stored Added an Item in the database!')
+                    temporary = str(Baseplate.show_data())
+                    print(f'ID {msg} Stored.')
+                    print(f'Content: {data}')
                     break
                 except:
                     conn.sendall('Must be an integer'.encode())
         elif msg == 'remove':
+            print(f'{addr} is removing an Item!')
             try:
                 conn.sendall('Enter in an ID to remove: '.encode())
                 msg = conn.recv(1024).decode()
+                print(f'{addr} is removing Item with an ID {msg}')
                 results=Baseplate.delete(msg)
                 conn.sendall(results.encode())
+                print(f'ID {msg} content has been removed!')
             except:
                 print('Key/ID Does not exist.')
                 conn.sendall('Key/ID Does not exist.'.encode())
@@ -92,17 +101,35 @@ def handle_client(conn, addr):
             conn.sendall('type "remove" to remove a data.\n'.encode())
             conn.sendall('type "list" to list available data.'.encode())
             conn.sendall('type "!DISCONNECT" to disconnect from the server.\n'.encode())
+        else:
+            print(f'Received from {addr}: {msg}')
     
     conn.close()
+
+status = True
+
+def Disconnect_Func(status):
+    while True:
+        command = input()
+        if command.upper() == 'SHUTDOWN':
+            status = False
+            break
+        else:
+            print(f'Command Does not Exist.')
+    Server.close()
+    print('\nServer is shutting down..\n')
+    exit
 
 def start():
     Server.listen()
     print('[LISTENING] SSLSSMS Server is listening for connections..')
-    while True:
+    com_centre = threading.Thread(target=Disconnect_Func, args=(status,))
+    com_centre.start()
+    while status:
         conn,addr = Server.accept()
         thread = threading.Thread(target=handle_client, args=(conn,addr))
         thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
+        print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 2}")
 
 print('SSLSSMS Server booting up! (Started)')
 start()
