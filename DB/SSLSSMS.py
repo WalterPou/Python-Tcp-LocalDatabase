@@ -131,5 +131,6 @@ def start():
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 2}")
 
-print('SSLSSMS Server booting up! (Started)')
-start()
+if __name__ == '__main__':
+    print('SSLSSMS Server booting up! (Started)')
+    start()
