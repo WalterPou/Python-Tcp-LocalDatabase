@@ -82,7 +82,8 @@ def handle_client(conn, addr):
                 conn.sendall('Enter in an ID to remove: '.encode())
                 msg = conn.recv(1024).decode()
                 results=Baseplate.delete(msg)
-                conn.sendall(results.encode())                                                                                                                        except:
+                conn.sendall(results.encode())                                                                                                                        
+            except:
                 print('Key/ID Does not exist.')
                 conn.sendall('Key/ID Does not exist.'.encode())
         elif msg == 'help':
