@@ -1,24 +1,25 @@
-#Lib
 import socket
 import threading
+import time
 
-h = input('H: ')
-p = int(input('P: '))
+h=input('H: ')
+p=int(input('P: '))
 
-def order(client_socket):
-	while True:
-		message = client_socket.recv(4096)
-		if not message:
-			break
-		print(f'Received from SSLSSMS (Server/Database): {message.decode()}')
+client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect((h,p))
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((h, p))
-print('Connection Establised!')
-thread1 = threading.Thread(target=order, args=(client_socket,))
-thread1.start()
+def order(client):
+    while True:                                                                                   msg = client.recv(1024).decode()
+        if not msg:
+            break                                                                                 print(f'> ', end=' ')
+        for char in msg:
+            print(char, end='', flush=True)
+            time.sleep(0.01)
+        print('\n')
+
+print('Connection Established!')
+thread=threading.Thread(target=order,args=(client,))
+thread.start()
 while True:
-	text = input()
-	if not text:
-		break
-	client_socket.sendall(text.encode())
+    text=input()
+    client.sendall(text.encode())
